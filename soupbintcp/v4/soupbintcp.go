@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io"
 	"net"
-  "sync/atomic"
-  "time"
+	"sync/atomic"
+	"time"
 
-  utils "github.com/johnietre/utils/go"
+	utils "github.com/johnietre/utils/go"
 )
 
 const (
@@ -131,8 +131,8 @@ func DebugPacket(payload Payload) Packet {
 func LoginAcceptedPacket(session Session, seqNum SequenceNumber) Packet {
 	// TODO: Padding?
 	payload := make([]byte, 0, 30)
-  payload = append(payload, session[:]...)
-  payload = append(payload, seqNum[:]...)
+	payload = append(payload, session[:]...)
+	payload = append(payload, seqNum[:]...)
 	return Packet{
 		PacketType: PacketTypeLoginAccepted,
 		Payload:    Payload(payload),
@@ -191,10 +191,10 @@ func LoginRequestPacket(
 	seqNum SequenceNumber,
 ) Packet {
 	payload := make([]byte, 0, 6+10+10+20)
-  payload = append(payload, username[:]...)
-  payload = append(payload, password[:]...)
-  payload = append(payload, session[:]...)
-  payload = append(payload, seqNum[:]...)
+	payload = append(payload, username[:]...)
+	payload = append(payload, password[:]...)
+	payload = append(payload, session[:]...)
+	payload = append(payload, seqNum[:]...)
 	return Packet{
 		PacketType: PacketTypeLoginRequest,
 		Payload:    Payload(payload),
@@ -356,7 +356,7 @@ func Connect(
 ) (*Client, error) {
 	return ConnectWithOpts(
 		addr,
-    handler,
+		handler,
 		&ConnectOpts{
 			Username: username,
 			Password: password,
@@ -386,9 +386,9 @@ func ConnectWithOpts(
 	if err := conn.SetDeadline(opts.Deadline); err != nil {
 		return nil, err
 	}
-  packet := LoginRequestPacket(
-    opts.Username, opts.Password, opts.Session, opts.SequenceNumber,
-  )
+	packet := LoginRequestPacket(
+		opts.Username, opts.Password, opts.Session, opts.SequenceNumber,
+	)
 	if _, err := conn.Write(packet.Serialize()); err != nil {
 		return nil, err
 	}
@@ -479,44 +479,44 @@ func (c *Client) IsClosed() bool {
 }
 
 type ClientConn struct {
-  srvr *Server
-  conn net.Conn
+	srvr           *Server
+	conn           net.Conn
 	heartbeatTimer *time.Timer
 }
 
 func (s *Server) newClientConn(conn net.Conn) *ClientConn {
-  cc := &ClientConn{srvr: s, conn: conn}
+	cc := &ClientConn{srvr: s, conn: conn}
 	cc.heartbeatTimer = time.AfterFunc(heartbeatDur, cc.heartbeat)
 	return cc
 }
 
 func (cc *ClientConn) run() {
-  // TODO: Any error/bad packet handling?
-  for {
-    packet, err := ReadPacketFrom(cc.conn)
-    if err != nil {
-      break
-    }
-    switch packet.PacketType {
-    case PacketTypeUnsequencedData:
-      go cc.srvr.Handler(cc, packet)
-    case PacketTypeClientHeartbeat:
-      // TODO
-      continue
-    case PacketTypeLogoutRequest:
-      break
-    default:
-      break
-    }
-  }
-  // TODO: Is any sort of synchronization needed?
-  cc.srvr.clients.Remove(cc)
-  cc.conn.Close()
+	// TODO: Any error/bad packet handling?
+	for {
+		packet, err := ReadPacketFrom(cc.conn)
+		if err != nil {
+			break
+		}
+		switch packet.PacketType {
+		case PacketTypeUnsequencedData:
+			go cc.srvr.Handler(cc, packet)
+		case PacketTypeClientHeartbeat:
+			// TODO
+			continue
+		case PacketTypeLogoutRequest:
+			break
+		default:
+			break
+		}
+	}
+	// TODO: Is any sort of synchronization needed?
+	cc.srvr.clients.Remove(cc)
+	cc.conn.Close()
 }
 
 // SendUnsequenced sends an unsequenced packet to the client.
 func (cc *ClientConn) SendUnsequenced(payload Payload) error {
-  return cc.sendPacket(UnsequencedDataPacket(payload))
+	return cc.sendPacket(UnsequencedDataPacket(payload))
 }
 
 func (cc *ClientConn) sendPacket(packet Packet) error {
@@ -549,18 +549,18 @@ type Server struct {
 	Username Username
 	// Password is the password used to authenticate clients.
 	Password Password
-  // ServerHandler is the handler for any packet received from a client.
-  Handler ServerHandler
+	// ServerHandler is the handler for any packet received from a client.
+	Handler ServerHandler
 
-  ln net.Listener
-  seqNum atomic.Uint64
+	ln       net.Listener
+	seqNum   atomic.Uint64
 	clients  *utils.SyncSet[*ClientConn]
 	closeErr *utils.AValue[utils.ErrorValue]
 }
 
 // Run runs the server.
 func (s *Server) Run() error {
-  var err error
+	var err error
 	if s.clients != nil {
 		err = s.CloseErr()
 		if err == nil {
@@ -568,16 +568,16 @@ func (s *Server) Run() error {
 		}
 		return err
 	}
-  if s.Handler == nil {
-    s.Handler = func(*ClientConn, Packet) {}
-  }
+	if s.Handler == nil {
+		s.Handler = func(*ClientConn, Packet) {}
+	}
 	s.clients = utils.NewSyncSet[*ClientConn]()
-  s.closeErr = &utils.AValue[utils.ErrorValue]{}
-  s.ln, err = net.Listen("tcp", s.Addr)
-  if err != nil {
-    s.closeErr.Store(utils.NewErrorValue(err))
-    return err
-  }
+	s.closeErr = &utils.AValue[utils.ErrorValue]{}
+	s.ln, err = net.Listen("tcp", s.Addr)
+	if err != nil {
+		s.closeErr.Store(utils.NewErrorValue(err))
+		return err
+	}
 	for {
 		conn, err := s.ln.Accept()
 		if err != nil {
@@ -590,13 +590,13 @@ func (s *Server) Run() error {
 // CloseErr gets the reason for the server being closed, if there is one.
 // A successful close is represented by ErrLoggedOut.
 func (s *Server) CloseErr() error {
-  ev, _ := s.closeErr.LoadSafe()
-  return ev.Error
+	ev, _ := s.closeErr.LoadSafe()
+	return ev.Error
 }
 
 // IsClosed returns whether the server is closed or not.
 func (s *Server) IsClosed() bool {
-  return s.CloseErr() == nil
+	return s.CloseErr() == nil
 }
 
 func (s *Server) handleLogin(conn net.Conn) {
@@ -627,31 +627,31 @@ func (s *Server) handleLogin(conn net.Conn) {
 		Payload:    Payload(buf),
 	}
 	username, password, _ := packet.Credentials()
-  session, _ := packet.Session()
-  // TODO: Sequence number
-  if !bytes.EqualFold(username[:], s.Username[:]) ||
-    !bytes.EqualFold(password[:], s.Password[:]) {
-    packet = LoginRejectPacket(LoginRejectNotAuthorized)
-    conn.Write(packet.Serialize())
-    return
-  } else if !bytes.Equal(session[:], s.Session[:]) {
-    packet = LoginRejectPacket(LoginRejectSessionNotAvail)
-    conn.Write(packet.Serialize())
-    return
-  }
-  packet = LoginAcceptedPacket(s.Session, s.nextSeqNum())
-  if _, err := conn.Write(packet.Serialize()); err != nil {
-    return
-  }
-  *closeConn = false
-  cc := s.newClientConn(conn)
-  go cc.run()
-  s.clients.Insert(cc)
+	session, _ := packet.Session()
+	// TODO: Sequence number
+	if !bytes.EqualFold(username[:], s.Username[:]) ||
+		!bytes.EqualFold(password[:], s.Password[:]) {
+		packet = LoginRejectPacket(LoginRejectNotAuthorized)
+		conn.Write(packet.Serialize())
+		return
+	} else if !bytes.Equal(session[:], s.Session[:]) {
+		packet = LoginRejectPacket(LoginRejectSessionNotAvail)
+		conn.Write(packet.Serialize())
+		return
+	}
+	packet = LoginAcceptedPacket(s.Session, s.nextSeqNum())
+	if _, err := conn.Write(packet.Serialize()); err != nil {
+		return
+	}
+	*closeConn = false
+	cc := s.newClientConn(conn)
+	go cc.run()
+	s.clients.Insert(cc)
 }
 
 func (s *Server) nextSeqNum() SequenceNumber {
-  // TODO
-  return SequenceNumber{}
+	// TODO
+	return SequenceNumber{}
 }
 
 func (s *Server) sendPacket(packet Packet) error {
@@ -667,16 +667,16 @@ func (s *Server) sendPacket(packet Packet) error {
 		}
 		return true
 	})
-  return nil
+	return nil
 }
 
 // SendSequenced sends a sequenced packet to all clients.
 func (s *Server) SendSequenced(payload Payload) error {
-  err := s.sendPacket(SequencedDataPacket(payload))
-  if err != nil {
-    s.seqNum.Add(1)
-  }
-  return err
+	err := s.sendPacket(SequencedDataPacket(payload))
+	if err != nil {
+		s.seqNum.Add(1)
+	}
+	return err
 }
 
 // SendUnsequenced sends an unsequenced packet to all clients.
@@ -688,7 +688,7 @@ func (s *Server) SendUnsequenced(payload Payload) error {
 }
 
 var (
-  ErrSessionEnded = fmt.Errorf("session ended")
+	ErrSessionEnded = fmt.Errorf("session ended")
 )
 
 // EndSessionAndClose ends the session (sends EndOfSession messages) and closes
@@ -701,9 +701,9 @@ func (s *Server) EndSessionAndClose() error {
 	} else {
 		s.closeErr.StoreIfEmpty(utils.NewErrorValue(err))
 	}
-  // TODO: Is this the right thing here?
-  if s.ln != nil {
-    s.ln.Close()
-  }
+	// TODO: Is this the right thing here?
+	if s.ln != nil {
+		s.ln.Close()
+	}
 	return err
 }

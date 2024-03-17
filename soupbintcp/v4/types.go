@@ -5,9 +5,9 @@ import (
 )
 
 const (
-  // MaxPayloadLen is the maximum payload length. It's 65534 because the
-  // maximum message length is 65535 and 1 byte is needed to encode the packet
-  // type.
+	// MaxPayloadLen is the maximum payload length. It's 65534 because the
+	// maximum message length is 65535 and 1 byte is needed to encode the packet
+	// type.
 	MaxPayloadLen = 0xFFFE
 )
 
@@ -140,12 +140,12 @@ func SessionFromBytes(b []byte) (Session, error) {
 	if l > 10 {
 		return session, fmt.Errorf("session too long")
 	}
-  start := 0
-  if l < 10 {
-    start = 10 - l
-  }
+	start := 0
+	if l < 10 {
+		start = 10 - l
+	}
 	copy(session[start:], b)
-  for i := 0; i < start; i++ {
+	for i := 0; i < start; i++ {
 		session[i] = ' '
 	}
 	return session, nil
@@ -155,12 +155,12 @@ func SessionFromBytes(b []byte) (Session, error) {
 // the bytes input if it's too long.
 func SessionFromBytesTrunc(b []byte) Session {
 	session, l := Session{}, len(b)
-  start := 0
-  if l < 10 {
-    start = 10 - l
-  }
+	start := 0
+	if l < 10 {
+		start = 10 - l
+	}
 	copy(session[start:], b)
-  for i := 0; i < start; i++ {
+	for i := 0; i < start; i++ {
 		session[i] = ' '
 	}
 	return session
@@ -177,12 +177,12 @@ func SequenceNumberFromBytes(b []byte) (SequenceNumber, error) {
 	if l > 20 {
 		return seqNum, fmt.Errorf("session too long")
 	}
-  start := 0
-  if l < 20 {
-    start = 20 - l
-  }
+	start := 0
+	if l < 20 {
+		start = 20 - l
+	}
 	copy(seqNum[start:], b)
-  for i := 0; i < start; i++ {
+	for i := 0; i < start; i++ {
 		seqNum[i] = ' '
 	}
 	return seqNum, nil
@@ -192,13 +192,13 @@ func SequenceNumberFromBytes(b []byte) (SequenceNumber, error) {
 // but truncates the bytes input if it's too long.
 func SequenceNumberFromBytesTrunc(b []byte) SequenceNumber {
 	seqNum, l := SequenceNumber{}, len(b)
-  start := 0
-  if l < 20 {
-    start = 20 - l
-  }
+	start := 0
+	if l < 20 {
+		start = 20 - l
+	}
 	copy(seqNum[start:], b)
-  for i := 0; i < start; i++ {
+	for i := 0; i < start; i++ {
 		seqNum[i] = ' '
 	}
-  return seqNum
+	return seqNum
 }

@@ -1,0 +1,21 @@
+[package]
+name = "moldudp64"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "moldudp64"
+path = "lib.rs"
+
+[[bin]]
+name = "testm"
+path = "test/udp-tests/main.rs"
+
+[[bin]]
+name = "test2"
+path = "test/udp-tests/test.rs"
+
+[dependencies]
+socket2 = { version = "0.5.6", features = ["all"] }

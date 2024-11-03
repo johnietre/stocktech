@@ -1,0 +1,11 @@
+[package]
+name = "soupbintcp"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+jtutils = { git = "https://github.com/johnietre/utils", version = "0.1.0", package = "utils" }
+tokio = { version = "^1", features = ["io-util", "net", "rt", "sync", "time"], optional = true }

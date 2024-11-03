@@ -91,14 +91,14 @@ type QuoteMessageLong struct {
 
 type NbboAppendageShort struct {
 	// NbboQuoteCond is the NBBO quote condition.
-	NbboQuoteCond     NbboQuoteConditionCode
-  // NbBidMarketCenter is the national best bid market center.
+	NbboQuoteCond NbboQuoteConditionCode
+	// NbBidMarketCenter is the national best bid market center.
 	NbBidMarketCenter MarketCenterOriginatorID
 	// NbBidPrice is the national best bid price.
 	NbBidPrice uint16
 	// NbBidSize is the national best bid size.
-	NbBidSize         uint16
-  // NbAskMarketCenter is the national best ask market center.
+	NbBidSize uint16
+	// NbAskMarketCenter is the national best ask market center.
 	NbAskMarketCenter MarketCenterOriginatorID
 	// NbAskPrice is the national best ask price.
 	NbAskPrice uint16
@@ -108,14 +108,14 @@ type NbboAppendageShort struct {
 
 type NbboAppendageLong struct {
 	// NbboQuoteCond is the NBBO quote condition.
-	NbboQuoteCond     NbboQuoteConditionCode
-  // NbBidMarketCenter is the national best bid market center.
+	NbboQuoteCond NbboQuoteConditionCode
+	// NbBidMarketCenter is the national best bid market center.
 	NbBidMarketCenter MarketCenterOriginatorID
 	// NbBidPrice is the national best bid price.
 	NbBidPrice uint64
 	// NbBidSize is the national best bid size.
-	NbBidSize         uint32
-  // NbAskMarketCenter is the national best ask market center.
+	NbBidSize uint32
+	// NbAskMarketCenter is the national best ask market center.
 	NbAskMarketCenter MarketCenterOriginatorID
 	// NbAskPrice is the national best ask price.
 	NbAskPrice uint64
@@ -162,175 +162,175 @@ type FinraAdfMpidQuotationMessage struct {
 // 3) Bid and Ask Sizes are less than 65535.
 // 4) Sale Condition modifier is not equal to "R" (Seller).
 type TradeReportMessageShort struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Timestamp2 is the FINRA timestamp.
-  Timestamp2 uint64
-  // Symbol is the security identifier.
-  Symbol [5]byte
-  // TradeId is the trade Id.
-  TradId uint64
-  // Price is the trade price.
-  Price uint16
-  // Volume is the trade volume.
-  Volume uint16
-  // Cond is the sale condition.
-  Cond [4]SaleConditionModifier
-  // TradeThrExempt is the trade through exempt flag.
-  TradeThrExempt byte
-  // ConsPriceChangeInd is the consolidated price change indicator.
-  ConsPriceChangeInd byte
-  // PartPriceChangeInd is the participant price change indicator.
-  PartPriceChangeInd byte
+	// Header is the message header.
+	Header MessageHeader
+	// Timestamp2 is the FINRA timestamp.
+	Timestamp2 uint64
+	// Symbol is the security identifier.
+	Symbol [5]byte
+	// TradeId is the trade Id.
+	TradId uint64
+	// Price is the trade price.
+	Price uint16
+	// Volume is the trade volume.
+	Volume uint16
+	// Cond is the sale condition.
+	Cond [4]SaleConditionModifier
+	// TradeThrExempt is the trade through exempt flag.
+	TradeThrExempt byte
+	// ConsPriceChangeInd is the consolidated price change indicator.
+	ConsPriceChangeInd byte
+	// PartPriceChangeInd is the participant price change indicator.
+	PartPriceChangeInd byte
 }
 
 type TradeReportMessageLong struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Timestamp2 is the FINRA timestamp.
-  Timestamp2 uint64
-  // Symbol is the security identifier.
-  Symbol [11]byte
-  // TradeId is the trade Id.
-  TradId uint64
-  // Price is the trade price.
-  Price uint64
-  // Volume is the trade volume.
-  Volume uint32
-  // Cond is the sale condition.
-  //
-  // If equal to "R" (Seller), the SaleDays field will reflect the number of
-  // dyas that may elapse before stock delivery.
-  Cond [4]byte
-  // TradeThrExempt is the trade through exempt flag.
-  TradeThrExempt byte
-  // SaleDays is the Seller's sale days.
-  SaleDays uint16
-  // ConsPriceChangeInd is the consolidated price change indicator.
-  ConsPriceChangeInd byte
-  // PartPriceChangeInd is the participant price change indicator.
-  PartPriceChangeInd byte
+	// Header is the message header.
+	Header MessageHeader
+	// Timestamp2 is the FINRA timestamp.
+	Timestamp2 uint64
+	// Symbol is the security identifier.
+	Symbol [11]byte
+	// TradeId is the trade Id.
+	TradId uint64
+	// Price is the trade price.
+	Price uint64
+	// Volume is the trade volume.
+	Volume uint32
+	// Cond is the sale condition.
+	//
+	// If equal to "R" (Seller), the SaleDays field will reflect the number of
+	// dyas that may elapse before stock delivery.
+	Cond [4]byte
+	// TradeThrExempt is the trade through exempt flag.
+	TradeThrExempt byte
+	// SaleDays is the Seller's sale days.
+	SaleDays uint16
+	// ConsPriceChangeInd is the consolidated price change indicator.
+	ConsPriceChangeInd byte
+	// PartPriceChangeInd is the participant price change indicator.
+	PartPriceChangeInd byte
 }
 
 type TradeCancelErrorMessage struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Timestamp2 is the FINRA timestamp.
-  Timestamp2 uint64
-  // Symbol is the security identifier.
-  Symbol [11]byte
-  // CancelType is the trade cancellation type.
-  CancelType TradeCancelTypeCode
-  // OrigTradeId is the original trade Id
-  OrigTradeId uint64
-  // OrigPrice is the original trade price
-  OrigPrice uint64
-  // OrigVolume is the original trade volume
-  OrigVolume uint32
-  // OrigCond is the original sale cond
-  OrigCond [4]byte
-  // OrigTradeThrExempt is the original trade through exempt flag.
-  OrigTradeThrExempt byte
-  // OrigSaleDays is the original Seller's sale days.
-  OrigSaleDays uint16
-  // ConsHighPrice is the consolidated high price.
-  ConsHighPrice uint64
-  // ConsLowPrice is the consolidated low price.
-  ConsLowPrice uint64
-  // ConsLastPrice is the consolidated last price.
-  ConsLastPrice uint64
-  // ConsVolume is the consolidated volume.
-  ConsVolume uint64
-  // ConsPriceChangeInd is the consolidated price change indicator.
-  ConsPriceChangeInd byte
-  // ConsLastPriceOrig is the market center originator ID.
-  ConsLastPriceOrig byte
-  // PartHighPrice is the market participant high price.
-  PartHighPrice uint64
-  // PartLowPrice is the market participant low price.
-  PartLowPrice uint64
-  // PartLastPrice is the market participant last price.
-  PartLastPrice uint64
-  // PartVolume is the market participant volume.
-  PartVolume uint64
+	// Header is the message header.
+	Header MessageHeader
+	// Timestamp2 is the FINRA timestamp.
+	Timestamp2 uint64
+	// Symbol is the security identifier.
+	Symbol [11]byte
+	// CancelType is the trade cancellation type.
+	CancelType TradeCancelTypeCode
+	// OrigTradeId is the original trade Id
+	OrigTradeId uint64
+	// OrigPrice is the original trade price
+	OrigPrice uint64
+	// OrigVolume is the original trade volume
+	OrigVolume uint32
+	// OrigCond is the original sale cond
+	OrigCond [4]byte
+	// OrigTradeThrExempt is the original trade through exempt flag.
+	OrigTradeThrExempt byte
+	// OrigSaleDays is the original Seller's sale days.
+	OrigSaleDays uint16
+	// ConsHighPrice is the consolidated high price.
+	ConsHighPrice uint64
+	// ConsLowPrice is the consolidated low price.
+	ConsLowPrice uint64
+	// ConsLastPrice is the consolidated last price.
+	ConsLastPrice uint64
+	// ConsVolume is the consolidated volume.
+	ConsVolume uint64
+	// ConsPriceChangeInd is the consolidated price change indicator.
+	ConsPriceChangeInd byte
+	// ConsLastPriceOrig is the market center originator ID.
+	ConsLastPriceOrig byte
+	// PartHighPrice is the market participant high price.
+	PartHighPrice uint64
+	// PartLowPrice is the market participant low price.
+	PartLowPrice uint64
+	// PartLastPrice is the market participant last price.
+	PartLastPrice uint64
+	// PartVolume is the market participant volume.
+	PartVolume uint64
 }
 
 type TradeCorrectionMessage struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Timestamp2 is the FINRA timestamp.
-  Timestamp2 uint64
-  // Symbol is the security identifier.
-  Symbol [11]byte
-  // OrigTradeId is the original trade Id
-  OrigTradeId uint64
-  // OrigPrice is the original trade price
-  OrigPrice uint64
-  // OrigVolume is the original trade volume
-  OrigVolume uint32
-  // OrigCond is the original sale cond
-  OrigCond [4]byte
-  // OrigTradeThrExempt is the original trade through exempt flag.
-  OrigTradeThrExempt byte
-  // OrigSaleDays is the original Seller's sale days.
-  OrigSaleDays uint16
-  // CorrTradeId is the corrected trade Id
-  CorrTradeId uint64
-  // CorrPrice is the corrected trade price
-  CorrPrice uint64
-  // CorrVolume is the corrected trade volume
-  CorrVolume uint32
-  // CorrCond is the corrected sale cond
-  CorrCond [4]byte
-  // CorrTradeThrExempt is the corrected trade through exempt flag.
-  CorrTradeThrExempt byte
-  // CorrSaleDays is the corrected Seller's sale days.
-  CorrSaleDays uint16
-  // ConsHighPrice is the consolidated high price.
-  ConsHighPrice uint64
-  // ConsLowPrice is the consolidated low price.
-  ConsLowPrice uint64
-  // ConsLastPrice is the consolidated last price.
-  ConsLastPrice uint64
-  // ConsVolume is the consolidated volume.
-  ConsVolume uint64
-  // ConsPriceChangeInd is the consolidated price change indicator.
-  ConsPriceChangeInd byte
-  // ConsLastPriceOrig is the market center originator ID.
-  ConsLastPriceOrig byte
-  // PartHighPrice is the market participant high price.
-  PartHighPrice uint64
-  // PartLowPrice is the market participant low price.
-  PartLowPrice uint64
-  // PartLastPrice is the market participant last price.
-  PartLastPrice uint64
-  // PartVolume is the market participant volume.
-  PartVolume uint64
+	// Header is the message header.
+	Header MessageHeader
+	// Timestamp2 is the FINRA timestamp.
+	Timestamp2 uint64
+	// Symbol is the security identifier.
+	Symbol [11]byte
+	// OrigTradeId is the original trade Id
+	OrigTradeId uint64
+	// OrigPrice is the original trade price
+	OrigPrice uint64
+	// OrigVolume is the original trade volume
+	OrigVolume uint32
+	// OrigCond is the original sale cond
+	OrigCond [4]byte
+	// OrigTradeThrExempt is the original trade through exempt flag.
+	OrigTradeThrExempt byte
+	// OrigSaleDays is the original Seller's sale days.
+	OrigSaleDays uint16
+	// CorrTradeId is the corrected trade Id
+	CorrTradeId uint64
+	// CorrPrice is the corrected trade price
+	CorrPrice uint64
+	// CorrVolume is the corrected trade volume
+	CorrVolume uint32
+	// CorrCond is the corrected sale cond
+	CorrCond [4]byte
+	// CorrTradeThrExempt is the corrected trade through exempt flag.
+	CorrTradeThrExempt byte
+	// CorrSaleDays is the corrected Seller's sale days.
+	CorrSaleDays uint16
+	// ConsHighPrice is the consolidated high price.
+	ConsHighPrice uint64
+	// ConsLowPrice is the consolidated low price.
+	ConsLowPrice uint64
+	// ConsLastPrice is the consolidated last price.
+	ConsLastPrice uint64
+	// ConsVolume is the consolidated volume.
+	ConsVolume uint64
+	// ConsPriceChangeInd is the consolidated price change indicator.
+	ConsPriceChangeInd byte
+	// ConsLastPriceOrig is the market center originator ID.
+	ConsLastPriceOrig byte
+	// PartHighPrice is the market participant high price.
+	PartHighPrice uint64
+	// PartLowPrice is the market participant low price.
+	PartLowPrice uint64
+	// PartLastPrice is the market participant last price.
+	PartLastPrice uint64
+	// PartVolume is the market participant volume.
+	PartVolume uint64
 }
 
 type PriorDayAsOrTradeMessage struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Timestamp2 is the FINRA timestamp.
-  Timestamp2 uint64
-  // Symbol is the security identifier.
-  Symbol [11]byte
-  // TradeId is the trade Id.
-  TradId uint64
-  // Price is the trade price.
-  Price uint64
-  // Volume is the trade volume.
-  Volume uint32
-  // Cond is the sale condition.
-  Cond [4]byte
-  // TradeThrExempt is the trade through exempt flag.
-  TradeThrExempt byte
-  // SaleDays is the Seller's sale days.
-  SaleDays uint16
-  // AsOfAction is the as-of action.
-  AsOfAction AsOfAction
-  // PriorTime is the timestamp of trade
-  PriorTime uint64
+	// Header is the message header.
+	Header MessageHeader
+	// Timestamp2 is the FINRA timestamp.
+	Timestamp2 uint64
+	// Symbol is the security identifier.
+	Symbol [11]byte
+	// TradeId is the trade Id.
+	TradId uint64
+	// Price is the trade price.
+	Price uint64
+	// Volume is the trade volume.
+	Volume uint32
+	// Cond is the sale condition.
+	Cond [4]byte
+	// TradeThrExempt is the trade through exempt flag.
+	TradeThrExempt byte
+	// SaleDays is the Seller's sale days.
+	SaleDays uint16
+	// AsOfAction is the as-of action.
+	AsOfAction AsOfAction
+	// PriorTime is the timestamp of trade
+	PriorTime uint64
 }
 
 /*** Administrative Messages ***/
@@ -338,25 +338,25 @@ type PriorDayAsOrTradeMessage struct {
 /** Trade and Quote Services (UQDF & UTDF) **/
 
 type GeneralAdministrativeMessage struct {
-  // Header is the message header.
-  Header MessageHeader
-  // TextLen is the text length.
-  TextLen uint16
-  // Text is the text.
-  Text []byte
+	// Header is the message header.
+	Header MessageHeader
+	// TextLen is the text length.
+	TextLen uint16
+	// Text is the text.
+	Text []byte
 }
 
 type CrossSroTradingActionMessage struct {
-  // Header is the message header.
-  Header MessageHeader
-  // Symbol is the security identifier.
-  Symbol [11]byte
-  // Action is the trading action code.
-  Action byte
-  // ActionSequence is the trading action sequence number.
-  ActionSequence uint32
-  // ActionTime is the timestamp of when the action occurred.
-  ActionTime uint64
-  // Reason is the reason for the trading action.
-  Reason [6]byte
+	// Header is the message header.
+	Header MessageHeader
+	// Symbol is the security identifier.
+	Symbol [11]byte
+	// Action is the trading action code.
+	Action byte
+	// ActionSequence is the trading action sequence number.
+	ActionSequence uint32
+	// ActionTime is the timestamp of when the action occurred.
+	ActionTime uint64
+	// Reason is the reason for the trading action.
+	Reason [6]byte
 }

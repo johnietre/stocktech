@@ -1,2 +1,4 @@
 github.com/johnietre/utils/go v0.0.0-20240223045556-d46797a29b45 h1:jJ8mriszaHeiUvVBT3Cs010MnhfxfxmPqLyOTsYYGbY=
 github.com/johnietre/utils/go v0.0.0-20240223045556-d46797a29b45/go.mod h1:EIHQk2LLgdrOzVqAfAAmDOwjQUB+j0lLB22TNRE0Xyk=
+github.com/johnietre/utils/go v0.0.0-20241025003556-618c7e5e83ff h1:nXE32fctVnZPn5UyjS2oEkqZ9EWTH/pV4C9qwTEpCqc=
+github.com/johnietre/utils/go v0.0.0-20241025003556-618c7e5e83ff/go.mod h1:EIHQk2LLgdrOzVqAfAAmDOwjQUB+j0lLB22TNRE0Xyk=

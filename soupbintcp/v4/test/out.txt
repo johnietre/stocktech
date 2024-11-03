@@ -1,0 +1,75 @@
+starting server
+started server
+starting clients
+new connection from 127.0.0.1:36666
+new connection from 127.0.0.1:36674
+new connection from 127.0.0.1:36694
+new connection from 127.0.0.1:36708
+new connection from 127.0.0.1:36700
+new connection from 127.0.0.1:36680
+new connection from 127.0.0.1:36710
+new connection from 127.0.0.1:36722
+new connection from 127.0.0.1:36730
+new connection from 127.0.0.1:36746
+new connection from 127.0.0.1:36762
+new connection from 127.0.0.1:36774
+new connection from 127.0.0.1:36788
+new connection from 127.0.0.1:36790
+new connection from 127.0.0.1:36806
+new connection from 127.0.0.1:36910
+new connection from 127.0.0.1:36818
+new connection from 127.0.0.1:36830
+new connection from 127.0.0.1:36842
+new connection from 127.0.0.1:36854
+new connection from 127.0.0.1:36868
+new connection from 127.0.0.1:36874
+new connection from 127.0.0.1:36886
+new connection from 127.0.0.1:36898
+new connection from 127.0.0.1:36816
+new connection from 127.0.0.1:36924
+new connection from 127.0.0.1:36932
+new connection from 127.0.0.1:36944
+new connection from 127.0.0.1:36958
+new connection from 127.0.0.1:36970
+new connection from 127.0.0.1:36978
+new connection from 127.0.0.1:36980
+new connection from 127.0.0.1:36988
+new connection from 127.0.0.1:36998
+new connection from 127.0.0.1:37000
+new connection from 127.0.0.1:37002
+new connection from 127.0.0.1:37010
+new connection from 127.0.0.1:37022
+new connection from 127.0.0.1:37024
+new connection from 127.0.0.1:37112
+new connection from 127.0.0.1:37034
+new connection from 127.0.0.1:37048
+new connection from 127.0.0.1:37056
+new connection from 127.0.0.1:37068
+new connection from 127.0.0.1:37084
+new connection from 127.0.0.1:37100
+new connection from 127.0.0.1:37030
+new connection from 127.0.0.1:37118
+new connection from 127.0.0.1:37122
+new connection from 127.0.0.1:37136
+started clients
+payload len: 2
+unsequenced payload: 42
+payload len: 1
+unsequenced payload: 6
+payload len: 2
+unsequenced payload: 24
+payload len: 2
+unsequenced payload: 37
+payload len: 2
+unsequenced payload: 47
+payload len: 2
+unsequenced payload: 49
+payload len: 2
+unsequenced payload: 41
+payload len: 1
+unsequenced payload: 7
+payload len: 2
+unsequenced payload: 31
+payload len: 2
+unsequenced payload: 44
+DONE

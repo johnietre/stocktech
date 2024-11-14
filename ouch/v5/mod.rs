@@ -1,18 +1,22 @@
+use std::cmd::{PartialEq, PartialOrd};
+use std::fmt;
+
 pub const REVISION: u8 = 4;
 
 /* Inbound messages */
 
-// TODO
 #[repr(transparent)]
+#[derive(Clone, Copy)]
 pub struct Symbol([u8; 8]);
 
 #[repr(transparent)]
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Price(u64);
 
 impl Price {
     pub const MAX: Self = Self(199_999_9900);
     pub const MAX_F64: f64 = 199_999.9900;
+    pub const MAX_U64: u64 = 199_999_9900;
     pub const MARKET: Self = Self(200_000_0000);
     pub const MARKET_CROSS: Self = Self(214_748_3647);
 
@@ -20,7 +24,7 @@ impl Price {
         if f > Self::MAX_F64 || f < 0.0 {
             return None;
         }
-        Some(Self(f as u64 * 10_000 + (f.fract() as u64 * 10_000)))
+        Some(Self(f as u64 * 10_000 + ((f.fract() * 10_000.0))))
     }
 
     pub fn to_f64(self) -> f64 {
@@ -28,9 +32,53 @@ impl Price {
         self.0 as f64 / 10_000
     }
 
+    pub fn to_f64_opt(self) -> Option<f64> {
+        if self.0 <= Self::MAX_U64 {
+            Some(self.0 as f64 / 10_000)
+        } else {
+            None
+        }
+    }
+
+    pub fn to_parts(self) -> (u32, u32) {
+        (self.0 / 10_000, self.0 % 10_000)
+    }
+
     pub const fn is_market(self) -> bool {
         // TODO: Check for market cross too?
         self == Self::MARKET || self == Self::MARKET_CROSS || self.0 == u64::MAX
+    }
+}
+
+impl PartialEq for Price {
+    fn eq(&self, other: &Self) -> bool {
+        if self.0 <= Self::MAX_U64 {
+            self.0 == other.0
+        } else {
+            false
+        }
+    }
+}
+
+impl PartialOrd for Price {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.0 <= Self::MAX_U64 && other <= Self::MAX_U64 {
+            self.0.partial_cmp(&other.0)
+        } else {
+            None
+        }
+    }
+}
+
+impl fmt::Display for Price {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.is_market() {
+            // FIXME: what to do
+            write!(f, "MARKET ORDER")
+        } else {
+            let (dollars, cents) = self.to_parts();
+            write!(f, "{dollars}.{cents:04}");
+        }
     }
 }
 
@@ -70,19 +118,45 @@ impl SignedPrice {
 #[repr(u8)]
 #[derive(Cloone, Copy, PartialEq, Eq, Debug)]
 pub enum OrderSide {
-    Buy = 'B',
-    Sell = 'S',
-    SellShort = 'T',
-    SellShortExempt = 'E',
+    Buy = b'B',
+    Sell = b'S',
+    SellShort = b'T',
+    SellShortExempt = b'E',
 }
 
 // TODO
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct UserRefNum(u32);
 
-// TODO
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct ClOrdId([u8; 14]);
+
+impl ClOrdId {
+    pub fn from_bytes(bytes: &[u8]) -> Option<Self> {
+        if bytes.len() != 14 {
+            return None;
+        }
+        let mut arr = [0u8; 14];
+        for i in 0..bytes.len() {
+            let b = bytes[i];
+            // FIXME: are there specific places spaces are/aren't allowed e.g., are spaces only
+            // padding characers, can an ID be all spaces?
+            if !b.is_ascii_alphanumeric() || b == b' ' {
+                return None;
+            }
+            arr[i] = b;
+        }
+        Some(Self(arr))
+    }
+}
+
+impl fmt::Display for ClOrdId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write(f, "{}", String::from_utf8_lossy(&self.0))
+    }
+}
 
 #[repr(u8)]
 #[derive(Cloone, Copy, PartialEq, Eq, Debug)]

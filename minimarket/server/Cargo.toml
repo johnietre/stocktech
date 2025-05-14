@@ -1,0 +1,14 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+either = "1.13.0"
+tokio = { version = "1.42.0", features = ["full"] }
+#jtutils = { git = "https://github.com/johnietre/utils", package = "utils" }
+jtutils = { path = "../../../utils/rust", package = "utils" }
+
+[[bin]]
+name = "server"
+path = "main.rs"

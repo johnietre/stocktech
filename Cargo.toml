@@ -1,4 +1,8 @@
 [workspace]
 resolver = "2"
 
-members = ["soupbintcp"]
+members = [ "common",
+  "minimarket/server",
+  "moldudp64", "ouch",
+  "soupbintcp",
+]

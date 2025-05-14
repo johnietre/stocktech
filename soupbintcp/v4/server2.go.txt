@@ -165,7 +165,7 @@ func (sc *SessionClient) CloseErr() error {
 
 // IsClosed returns whether the client is closed.
 func (sc *SessionClient) IsClosed() bool {
-	return sc.CloseErr() != nil
+	return sc.CloseErr() == nil
 }
 
 func (sc *SessionClient) start() {
@@ -187,8 +187,6 @@ func bubblePackets(pkts []sequencedPacket) {
   }
 }
 
-/* CHECKMARK */
-
 func (sc *SessionClient) runSend() {
 	ch := *sc.packetChan.RLock()
 	sc.packetChan.RUnlock()
@@ -208,8 +206,8 @@ Loop:
         if seqPacket.packet.PacketType() == PacketTypeEndOfSession {
         }
         isSeq := seqPacket.seqNum != 0 &&
-          // packet.PacketType() == PacketTypeSequencedData &&
-          true
+        // packet.PacketType() == PacketTypeSequencedData &&
+        true
         shouldSend := true
         if isSeq {
           if seqPacket.seqNum > nextSeqNum {
@@ -220,13 +218,12 @@ Loop:
             shouldSend = false
           } else if seqPacket.seqNum < nextSeqNum {
             shouldSend = false
-          } else {
-            nextSeqNum++
           }
         }
         if shouldSend {
           if _, err := sc.conn.Write(seqPacket.packet.Bytes()); err != nil {
             sc.closeWithErr(err)
+            fmt.Println("broken")
             break Loop
           }
         }
@@ -242,6 +239,7 @@ Loop:
           }
           if _, err := sc.conn.Write(spkt.packet.Bytes()); err != nil {
             sc.closeWithErr(err)
+            fmt.Println("returned")
             return
           }
           data = data[1:]
@@ -252,6 +250,7 @@ Loop:
           } else if spkt.seqNum == nextSeqNum {
 						if _, err := sc.conn.Write(spkt.packet.Bytes()); err != nil {
 							sc.closeWithErr(err)
+            fmt.Println("returned2")
               return
 						}
             if start == 0 {
@@ -701,25 +700,15 @@ func (s *Session) handle(conn *net.TCPConn, loginPacket Packet) {
       client.close()
       return
     }
-    if true {
-      pkts = append(pkts, sequencedPacket{
-        seqNum: nextNum,
-        packet: SequencedDataPacket(payload),
-      })
-    }
-    if false {
-      client.sendPacket(sequencedPacket{
-        seqNum: nextNum,
-        packet: SequencedDataPacket(payload),
-      })
-    }
-  }
-  if len(pkts) != 0 {
-    client.packetQueue.Apply(func(sp **utils.Slice[sequencedPacket]) {
-      sl := *sp
-      sl.Append(pkts...)
+    pkts = append(pkts, sequencedPacket{
+      seqNum: nextNum,
+      packet: SequencedDataPacket(payload),
     })
   }
+  client.packetQueue.Apply(func(sp **utils.Slice[sequencedPacket]) {
+    sl := *sp
+    sl.Append(pkts...)
+  })
   client.sendPacket(sequencedPacket{checkOnly: true})
 	*shouldClose = false
 	// TODO: move up?

@@ -1,72 +1,22 @@
 package ouch
 
 import (
-  "math"
+  "github.com/johnietre/stocktech/common/nasdaq"
+  utils "github.com/johnietre/utils/go"
 )
 
-const (
-  MaxPriceFloat64 float64 = 199_999.9900
-  maxPriceUint64 uint64 = 199_999_9900
-)
+type UserRefNum uint32
 
-type Symbol struct {
-  inner [8]byte
+func NewUserRefNum(num uint32) UserRefNum {
+  return UserRefNum(num)
 }
 
-// TODO
-
-type Price struct {
-  inner uint64
+func (urn UserRefNum) Incr() UserRefNum {
+  return urn + 1
 }
 
-func PriceFromFloat64(f float64) (Price, bool) {
-  if f > MaxPriceFloat64 || f < 0.0 {
-    return Price{}, false
-  }
-  ip, fp := math.Modf(f)
-  return Price{
-    inner: uint64(ip) * 10_000 + uint64(fp * 10_000.0),
-  }, true
-}
-
-func (p Price) ToFloat64() float64 {
-  // TODO
-  return float64(p.inner) / 10_000.0
-}
-
-func (p Price) ToFloat64Safe() (f float64, ok bool) {
-  if self.inner <= MaxPriceFloat64 {
-    f = float64(self.inner) / 10_000.0
-  }
-  return
-}
-
-func (p Price) ToParts() (uint64, uint64) {
-  return p.inner / 10_000, p.inner % 10_000
-}
-
-func (p Price) IsMarket() bool {
-  // TODO: check for market cross too?
-  return p.inner == marketUint64 || p.inner == marketCrossUint64 || p.inner == math.MaxUint64
-}
-
-func (p Price) Eq(other Price) bool {
-  return p.inner <= maxPriceUint64 && p.inner == other.inner
-}
-
-/*
-func (p Price) Cmp(other Price) int {
-  //
-}
-*/
-
-func (p Price) String() string {
-  if p.IsMarket() {
-    // FIXME: what to do
-    return "MARKET ORDER"
-  }
-  dollars, cents := p.ToParts()
-  return fmt.Sprintf("%d.%04f", dollars, cents)
+func (urn UserRefNum) Add(n uint32) UserRefNum {
+  return urn + UserRefNum(n)
 }
 
 type ClOrdId struct {
@@ -90,6 +40,68 @@ func ClOrdIdFromBytes(b []byte) (coi ClOrdId, ok bool) {
 
 func (coi ClOrdId) String() string {
   return string(coi.inner[:])
+}
+
+type Firm struct {
+}
+
+type TagValue struct {
+  OptionValue OptionValue
+}
+
+func (tv TagValue) Length() byte {
+  return byte(tv.OptionValue.size())
+}
+
+const MaxOptionalAppendageLen int = 1<<16 - 1
+
+type OptionalAppendage struct {
+  inner *utils.Slice[TagValue]
+}
+
+func NewOptionalAppendage(tvs []TagValue) (OptionalAppendage, bool) {
+  if len(tvs) > MaxOptionalAppendageLen {
+    return OptionalAppendage{}, false
+  }
+  return OptionalAppendage{inner: utils.NewSlice(tvs)}, true
+}
+
+// Push returns true if the value was successfully added.
+func (oa OptionalAppendage) Push(tv TagValue) bool {
+  if oa.Len() >= MaxOptionalAppendageLen {
+    return false
+  }
+  oa.inner.PushBack(tv)
+  return true
+}
+
+// Insert returns true if the value was successfully added.
+func (oa OptionalAppendage) Insert(index int, tv TagValue) bool {
+  if oa.Len() >= MaxOptionalAppendageLen {
+    return false
+  }
+  oa.inner.Insert(index, tv)
+  return true
+}
+
+// Pop removes the last value and returns it, if it exists.
+func (oa OptionalAppendage) Pop() (TagValue, bool) {
+  return oa.inner.PopBack()
+}
+
+// Remove removes the last value and returns it, if it exists.
+func (oa OptionalAppendage) Remove(index int) (TagValue, bool) {
+  return oa.inner.Remove(index)
+}
+
+// Len returns the length of the optional appendage.
+func (oa OptionalAppendage) Len() int {
+  return oa.inner.Len()
+}
+
+// Inner returns the inner slice of the optional appendage.
+func (oa OptionalAppendage) Inner() []TagValue {
+  return oa.inner.Data()
 }
 
 type Appendage struct {
@@ -174,8 +186,8 @@ type EnterOrder struct {
   UserRefNum UserRefNum
   Side OrderSide
   Quantity uint32
-  Symbol Symbol
-  Price Price
+  Symbol nasdaq.Symbol
+  Price nasdaq.Price
   TimeInForce TimeInForce
   Display Display
   Capacity Capacity
@@ -192,8 +204,8 @@ func (eo EnterOrder) Type() byte {
 type ReplaceOrderRequest struct {
   OrigUserRefNum UserRefNum
   UserRefNum UserRefNum
-  Quantity u32
-  Price Price
+  Quantity uint32
+  Price nasdaq.Price
   TimeInForce TimeInForce
   Display Display
   InterMarketSweepEligibility IMSE

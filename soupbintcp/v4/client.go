@@ -3,6 +3,7 @@
 package soupbintcp
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"sync/atomic"
@@ -76,6 +77,8 @@ type Client struct {
 	serverHeartbeatTimer *time.Timer
 
 	closeErr *utils.AValue[utils.ErrorValue]
+  // Is closed when the client is closed.
+  closedChan chan utils.Unit
 }
 
 // Connect connects to a server, returning a client. See ConnectWithOpts for
@@ -130,9 +133,18 @@ func ConnectWithOpts(
 	if err := conn.SetDeadline(opts.Deadline); err != nil {
 		return nil, err
 	}
+  sess := opts.Session
+  if sess.Eq(SessionId{}) {
+    sess = SessionIdBlank()
+  }
+  // TODO: is this necessary?
+  seqNum := opts.SequenceNumber
+  if seqNum.Eq(SequenceNumber{}) {
+    seqNum = SequenceNumberZero()
+  }
 	packet := LoginRequestPacket(
 		opts.Username, opts.Password,
-		opts.Session, opts.SequenceNumber,
+		sess, seqNum,
 	)
 	if _, err := conn.Write(packet.Bytes()); err != nil {
 		return nil, err
@@ -196,6 +208,7 @@ func ConnectWithOpts(
 		currSession: sessionId,
 
 		closeErr: &utils.AValue[utils.ErrorValue]{},
+    closedChan: make(chan utils.Unit, 0),
 	}
 
 	c.nextSeqNum.Store(nextSeqNum)
@@ -257,6 +270,10 @@ func (c *Client) IncrSequenceNumber() {
 	if c.handler != nil {
 		return
 	}
+  c.incrSequenceNumber()
+}
+
+func (c *Client) incrSequenceNumber() {
 	c.nextSeqNum.Add(1)
 }
 
@@ -278,6 +295,9 @@ func (c *Client) startListenPackets() bool {
 		return false
 	}
 	debugHandler := c.opts.DebugHandler
+  nextSeqNum := c.NextSeqNum()
+  nextPktCh := utils.NewAValue(make(chan utils.Unit, 0))
+  close(nextPktCh.Load())
 	go func() {
 		for {
 			packet, err := ReadPacketFrom(conn)
@@ -296,14 +316,47 @@ func (c *Client) startListenPackets() bool {
 				}
 				continue
 			case PacketTypeSequencedData:
-				c.IncrSequenceNumber()
+				//c.IncrSequenceNumber()
+        nextSeqNum++
 			case PacketTypeEndOfSession:
 				conn.Close()
 				c.closeWithErr(ErrSessionEnded)
+        c.handler(c, packet)
 				return
 				// TODO: handle other (besides unsequenced)?
 			}
-			go c.handler(c, packet)
+			//go c.handler(c, packet)
+			go func(seqNum uint64) {
+        if packet.PacketType() == PacketTypeSequencedData {
+          fmt.Println("SEQ NUM:", seqNum)
+          if seqNum < c.NextSeqNum() {
+            return
+          }
+          ch := nextPktCh.Load()
+NextPktChLoop:
+          for {
+            select {
+            case _, _ = <-ch:
+              if seqNum == c.NextSeqNum() {
+                ch = make(chan utils.Unit, 0)
+                nextPktCh.Store(ch)
+                break NextPktChLoop
+              }
+              ch = nextPktCh.Load()
+            }
+          }
+          //fmt.Println("GOT:", seqNum)
+          c.incrSequenceNumber()
+          close(ch)
+          /*
+          fmt.Println("WAITING:", seqNum, c.NextSeqNum())
+          for seqNum > c.NextSeqNum() {}
+          c.incrSequenceNumber()
+          fmt.Println("GOT:", seqNum, c.NextSeqNum())
+          */
+        }
+        c.handler(c, packet)
+      }(nextSeqNum-1)
 		}
 	}()
 	return true
@@ -406,7 +459,34 @@ func (c *Client) IsClosed() bool {
 	return c.CloseErr() != nil
 }
 
+// Wait waits for the client to be closed. If there is no done channel or the
+// context is nil, the function returns immediately whether it is closed or
+// not. Otherwise, it waits for closure or the context to be canceled,
+// whichever is first.
+func (c *Client) Wait(ctx context.Context) bool {
+  _, ok := <-c.closedChan
+  if ok {
+    return true
+  }
+  if ctx == nil {
+    return false
+  }
+  done := ctx.Done()
+  if done == nil {
+    return false
+  }
+  closed := false
+  select {
+  case _, _ = <-done:
+  case _, _ = <- c.closedChan:
+    closed = true
+  }
+  return closed
+}
+
 func (c *Client) closeWithErr(err error) error {
-	c.closeErr.StoreIfEmpty(utils.NewErrorValue(err))
+	if c.closeErr.StoreIfEmpty(utils.NewErrorValue(err)) {
+    close(c.closedChan)
+  }
 	return c.closeErr.Load().Error
 }

@@ -3,9 +3,11 @@ package soupbintcp
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
+	"time"
 
 	utils "github.com/johnietre/utils/go"
 )
@@ -918,4 +920,31 @@ func isAsciiAlphaNumeric(b byte) bool {
 	return (b >= '0' && b <= '9') ||
 		(b >= 'A' && b <= 'Z') ||
 		(b >= 'a' && b <= 'z')
+}
+
+type neverDoneCtx struct {
+  ch chan struct{}
+}
+
+// NeverDoneContext is a context that has a done channel but that channel is
+// never closed. This is useful/convenient for infinitely waiting for a Wait
+// function which takes a context and uses its Done() channel.
+func NeverDoneContext() context.Context {
+  return neverDoneCtx{ch: make(chan struct{})}
+}
+
+func (neverDoneCtx) Deadline() (deadline time.Time, ok bool) {
+  return
+}
+
+func (ctx neverDoneCtx) Done() <-chan struct{} {
+  return ctx.ch
+}
+
+func (neverDoneCtx) Err() error {
+  return nil
+}
+
+func (neverDoneCtx) Value(key any) any {
+  return nil
 }

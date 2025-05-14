@@ -769,19 +769,22 @@ impl Deref for Packet {
     type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
-        self.0.as_slice()
+        //self.0.as_slice()
+        &self.0[2..]
     }
 }
 
 impl AsRef<[u8]> for Packet {
     fn as_ref(&self) -> &[u8] {
-        self.0.as_slice()
+        //self.0.as_slice()
+        &self.0[2..]
     }
 }
 
 impl Borrow<[u8]> for Packet {
     fn borrow(&self) -> &[u8] {
-        self.0.as_slice()
+        //self.0.as_slice()
+        &self.0[2..]
     }
 }
 
